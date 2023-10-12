@@ -1,23 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
     public static Player Instance { get; private set; }
 
+    [Header("Movement")]
     public float moveSpeed;
     public float rotationSpeed;
-    public bool CanShoot;
-
-    public int health;
-
-    public GameObject bulletPrefab;
-    public Transform firePoint;
-
     private CharacterController characterController;
     private Vector3 moveDirection;
 
+    [Header("UI")]
+    public int health;
+    public string SceneDeaht;
+    public int KillCount;
+
+    [Header("Bullets")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public bool CanShoot;
     public float nextFireTime = 0;
     public float autoFireInterval;
 
@@ -26,6 +30,7 @@ public class Player : MonoBehaviour
     public float TimeToLevel = 0f;
     public float LevelUpTimer = 10f;
     private bool CanLevelUp;
+
 
     private void Awake()
     {
@@ -89,6 +94,7 @@ public class Player : MonoBehaviour
                 CanLevelUp = true;
             }
         }
+
     }
 
     void StartTimerShoot()
@@ -106,15 +112,31 @@ public class Player : MonoBehaviour
     {
         StartTimerShoot();
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-
         Rigidbody rb = bullet.GetComponent <Rigidbody>();
-
         rb.AddForce(firePoint.forward * 10f, ForceMode.Impulse);
     }
 
     void LevelUp()
     {
         StartTimerLevelUp();
+        currentLevel++;
         autoFireInterval -= 0.5f;
+    }
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy") || other.gameObject.CompareTag("EnemyBullet"))
+        {
+            health--;
+
+            if (health <= 0)
+            {
+                SceneManager.LoadScene(SceneDeaht); 
+            }
+        }
+
+        if (other.gameObject.CompareTag("EnemyBullet"))
+        {
+            Destroy(other.gameObject);
+        }
     }
 }
