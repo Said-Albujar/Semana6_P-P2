@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Enemy2 : MonoBehaviour
 {
-    public Transform player; 
+    public Transform player;
+    private Player playerC;
     public GameObject bulletPrefab;
     public Transform firePoint;
+    private int health = 1;
     public float fireRate = 2.0f;
     public float nextFireTime;
     public bool CanShoot;
@@ -17,8 +20,13 @@ public class Enemy2 : MonoBehaviour
     private void Start()
     {
         player = FindObjectOfType<Player>().transform;
+        playerC = FindObjectOfType<Player>();
 
         if (player == null)
+        {
+            Debug.LogError("No se encontró el objeto del jugador en la escena.");
+        }
+        if (playerC == null)
         {
             Debug.LogError("No se encontró el objeto del jugador en la escena.");
         }
@@ -84,5 +92,21 @@ public class Enemy2 : MonoBehaviour
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         rb.AddForce(firePoint.forward * 10f, ForceMode.Impulse);
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PlayerBullet"))
+        {
+            health--;
+
+            if (health <= 0)
+            {
+                playerC.KillCount += 1;
+                Destroy(gameObject);
+            }
+
+            Destroy(other.gameObject);
+        }
     }
 }

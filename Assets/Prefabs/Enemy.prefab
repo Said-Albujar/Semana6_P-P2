@@ -114,9 +114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   health: 1
-  moveSpeed: 3
-  TimeToLevel: 0
-  LevelUpTimer: 10
+  moveSpeed: 2
 --- !u!54 &6984866574557725262
 Rigidbody:
   m_ObjectHideFlags: 0

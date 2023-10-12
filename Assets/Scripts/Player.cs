@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
-    public static Player Instance { get; private set; }
 
     [Header("Movement")]
     public float moveSpeed;
@@ -15,8 +15,13 @@ public class Player : MonoBehaviour
 
     [Header("UI")]
     public int health;
+    public TextMeshProUGUI healthText;
     public string SceneDeaht;
+    public string SceneVictory;
     public int KillCount;
+    public TextMeshProUGUI KillText;
+    public float time = 0.0f;
+    public TextMeshProUGUI timeText;
 
     [Header("Bullets")]
     public GameObject bulletPrefab;
@@ -26,23 +31,11 @@ public class Player : MonoBehaviour
     public float autoFireInterval;
 
     [Header("Level Up")]
+    public TextMeshProUGUI levelText;
     public int currentLevel = 1;
     public float TimeToLevel = 0f;
     public float LevelUpTimer = 10f;
     private bool CanLevelUp;
-
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     void Start()
     {
@@ -67,6 +60,12 @@ public class Player : MonoBehaviour
         }
 
         characterController.SimpleMove(moveDirection * moveSpeed);
+
+        time += Time.deltaTime;
+        timeText.text = "Time: " + Mathf.Round(time).ToString();
+        healthText.text = "Health: " + health.ToString();
+        KillText.text = "Kills: " + KillCount.ToString();
+        levelText.text = "Level: " + currentLevel.ToString();
 
         if (CanShoot)
         {
@@ -95,8 +94,11 @@ public class Player : MonoBehaviour
             }
         }
 
+        if(currentLevel == 10 || KillCount >= 100)
+        {
+            SceneManager.LoadScene(SceneVictory);
+        }
     }
-
     void StartTimerShoot()
     {
         nextFireTime = autoFireInterval;
